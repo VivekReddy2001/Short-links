@@ -1,26 +1,33 @@
 {
-  "name": "url-shortner",
+  "name": "short-links",
   "version": "1.0.0",
-  "description": "",
+  "description": "A small self-hosted URL shortener: anyone can shorten a link, and signed-in users get custom aliases, click counts, and collections to file links into.",
   "main": "app.js",
   "scripts": {
-    "start":"node app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "url-shortener",
+    "express",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "Vivek Reddy (https://github.com/VivekReddy2001)",
   "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "bcrypt": "^5.0.1",
-    "curl": "^0.1.4",
-    "ejs": "^3.1.8",
-    "express": "^4.18.1",
-    "express-session": "^1.17.3",
-    "mongoose": "^6.4.0",
-    "nodemon": "^2.0.16",
-    "shortid": "^2.2.16",
-    "url-exist": "^3.0.0",
-    "url-exists": "^1.0.3",
-    "url-validation": "^2.1.0",
-    "valid-url": "^1.0.9"
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "express-session": "^1.18.0",
+    "mongoose": "^6.13.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }

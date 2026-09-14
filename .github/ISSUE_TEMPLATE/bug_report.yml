@@ -1,0 +1,30 @@
+name: Bug report
+description: Something doesn't work the way it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node version
+      placeholder: node -v
+  - type: dropdown
+    id: mongo
+    attributes:
+      label: Database
+      options:
+        - Local mongod
+        - MongoDB Atlas
+        - Other

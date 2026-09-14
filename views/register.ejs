@@ -1,0 +1,20 @@
+<%- include('partials/header', { title: 'Register — Short-links' }) %>
+
+<section class="auth-form">
+    <h1>Create an account</h1>
+    <% if (error) { %>
+        <p class="error"><%= error %></p>
+    <% } %>
+    <form method="POST" action="/register">
+        <label>Username
+            <input type="text" name="username" minlength="3" maxlength="32" required autofocus />
+        </label>
+        <label>Password
+            <input type="password" name="password" minlength="6" required />
+        </label>
+        <button type="submit">Create account</button>
+    </form>
+    <p class="muted">Already have an account? <a href="/login">Log in</a></p>
+</section>
+
+<%- include('partials/footer') %>

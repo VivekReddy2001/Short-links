@@ -1,11 +1,16 @@
+const URL = require('url').URL;
 
-const URL = require("url").URL;
-  const stringIsAValidUrl = (s) => {
+// Only accept http(s) links. Without this, `new URL(s)` alone happily
+// parses schemes like javascript: or data: too — harmless as a redirect
+// Location header in every modern browser, but there's no reason to let a
+// non-web scheme into the database in the first place.
+const stringIsAValidUrl = (s) => {
     try {
-      new URL(s);
-      return true;
+        const url = new URL(s);
+        return url.protocol === 'http:' || url.protocol === 'https:';
     } catch (err) {
-      return false;
+        return false;
     }
-  };
+};
+
 module.exports = stringIsAValidUrl;

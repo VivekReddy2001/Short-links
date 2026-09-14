@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  boot-check:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: npm install
+
+      - name: Start the app and confirm it serves the home page
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/short-links-ci
+          SESSION_SECRET: ci-secret
+          PORT: 3000
+        run: |
+          node app.js &
+          APP_PID=$!
+          for i in $(seq 1 20); do
+            if curl -sf http://127.0.0.1:3000/ > /dev/null; then
+              echo "App responded."
+              kill $APP_PID
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "App never came up."
+          kill $APP_PID 2>/dev/null || true
+          exit 1

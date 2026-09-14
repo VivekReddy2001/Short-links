@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= typeof title !== 'undefined' ? title : 'Short-links' %></title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="/">Short-links</a>
+        <nav>
+            <% if (user) { %>
+                <span class="nav-user">Hi, <%= user.username %></span>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/logout">Log out</a>
+            <% } else { %>
+                <a href="/login">Log in</a>
+                <a href="/register">Register</a>
+            <% } %>
+        </nav>
+    </header>
+    <main class="container">

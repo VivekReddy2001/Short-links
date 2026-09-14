@@ -1,0 +1,13 @@
+<%- include('partials/header', { title: 'Not found — Short-links' }) %>
+
+<section class="hero">
+    <h1>404</h1>
+    <% if (code) { %>
+        <p>No link is registered under <code>/<%= code %></code>.</p>
+    <% } else { %>
+        <p>There's nothing here.</p>
+    <% } %>
+    <p><a href="/">Back home</a></p>
+</section>
+
+<%- include('partials/footer') %>

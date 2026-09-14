@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security issue
+    url: https://github.com/VivekReddy2001/Short-links/security/advisories/new
+    about: Please report vulnerabilities privately rather than as a public issue. See SECURITY.md for known, already-disclosed gaps.
