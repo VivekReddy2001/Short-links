@@ -2,25 +2,47 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
+  test:
+    name: Lint & test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Cache MongoDB binaries used by the tests
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ runner.os }}-v1
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
   boot-check:
+    name: Boot against a real MongoDB
     runs-on: ubuntu-latest
     services:
       mongodb:
-        image: mongo:7
+        image: mongo:8
         ports:
           - 27017:27017
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 18
-
-      - run: npm install
-
+          node-version: 24
+          cache: npm
+      - run: npm ci --omit=dev
       - name: Start the app and confirm it serves the home page
         env:
           MONGODB_URI: mongodb://127.0.0.1:27017/short-links-ci
@@ -29,7 +51,7 @@ jobs:
         run: |
           node app.js &
           APP_PID=$!
-          for i in $(seq 1 20); do
+          for i in $(seq 1 30); do
             if curl -sf http://127.0.0.1:3000/ > /dev/null; then
               echo "App responded."
               kill $APP_PID

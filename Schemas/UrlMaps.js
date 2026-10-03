@@ -14,6 +14,13 @@ const urlMapSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        // Optional free-text note, searchable from the dashboard.
+        description: {
+            type: String,
+            trim: true,
+            maxlength: 200,
+            default: '',
+        },
         // null for links created anonymously from the home page.
         owner: {
             type: mongoose.Schema.Types.ObjectId,

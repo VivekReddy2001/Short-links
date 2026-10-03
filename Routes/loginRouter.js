@@ -1,9 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 
 const User = require('../Schemas/User');
-const resumePendingAction = require('../resumePendingAction');
+const resumePendingAction = require('../lib/resumePendingAction');
+const { signIn } = require('../lib/session');
+const { str } = require('../lib/input');
+
+// A real bcrypt hash of a random string, at the same cost as stored
+// passwords. Comparing against it when the username doesn't exist makes a
+// failed login take as long as a wrong password, so response times don't
+// reveal which usernames are registered.
+const DUMMY_HASH = bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), Number(process.env.BCRYPT_ROUNDS) || 10);
 
 router.get('/', (req, res) => {
     if (req.session.user) return res.redirect('/dashboard');
@@ -11,16 +20,16 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const username = (req.body.username || '').trim();
-    const { password } = req.body;
+    const username = str(req.body.username);
+    const password = typeof req.body.password === 'string' ? req.body.password : '';
 
-    const user = await User.findOne({ username });
-    const ok = user && (await bcrypt.compare(password || '', user.password));
-    if (!ok) {
-        return res.render('login', { error: 'Wrong username or password.' });
+    const user = username ? await User.findOne({ username }) : null;
+    const ok = await bcrypt.compare(password, user ? user.password : DUMMY_HASH);
+    if (!user || !ok) {
+        return res.status(401).render('login', { error: 'Wrong username or password.' });
     }
 
-    req.session.user = { _id: user._id, username: user.username };
+    await signIn(req, user);
     await resumePendingAction(req);
     res.redirect('/dashboard');
 });

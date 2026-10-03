@@ -6,11 +6,12 @@
         <p class="error"><%= error %></p>
     <% } %>
     <form method="POST" action="/register">
+        <%- include('partials/csrf') %>
         <label>Username
-            <input type="text" name="username" minlength="3" maxlength="32" required autofocus />
+            <input type="text" name="username" minlength="3" maxlength="32" pattern="[a-zA-Z0-9_.\-]{3,32}" required autofocus />
         </label>
         <label>Password
-            <input type="password" name="password" minlength="6" required />
+            <input type="password" name="password" minlength="8" maxlength="72" required />
         </label>
         <button type="submit">Create account</button>
     </form>

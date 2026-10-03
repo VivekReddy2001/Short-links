@@ -5,6 +5,7 @@
     <p class="muted">No account needed. Sign in if you want to pick a custom alias or keep track of your links.</p>
 
     <form class="shorten-form" method="POST" action="/">
+        <%- include('partials/csrf') %>
         <input
             type="url"
             name="longUrl"
@@ -12,6 +13,9 @@
             value="<%= longUrl %>"
             required
         />
+        <% if (user) { %>
+            <input type="text" name="description" maxlength="200" placeholder="Note (optional, searchable)" />
+        <% } %>
         <button type="submit" name="submit" value="Generate Short URL">Shorten</button>
     </form>
 

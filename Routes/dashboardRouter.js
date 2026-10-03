@@ -3,14 +3,25 @@ const router = express.Router();
 
 const UrlMap = require('../Schemas/UrlMaps');
 const Collection = require('../Schemas/Collection');
-const requireLogin = require('../requireLogin');
+const requireLogin = require('../lib/requireLogin');
+const { str, escapeRegex } = require('../lib/input');
 
 router.use(requireLogin);
 
 router.get('/', async (req, res) => {
     const ownerId = req.session.user._id;
+    const q = str(req.query.q).slice(0, 100);
+
+    // Search matches the description, the destination and the short code,
+    // case-insensitively. The query is escaped, so it is matched literally.
+    const filter = { owner: ownerId };
+    if (q) {
+        const re = new RegExp(escapeRegex(q), 'i');
+        filter.$or = [{ description: re }, { longUrl: re }, { shortUrl: re }];
+    }
+
     const [urls, collections] = await Promise.all([
-        UrlMap.find({ owner: ownerId }).sort({ createdAt: -1 }).lean(),
+        UrlMap.find(filter).sort({ createdAt: -1 }).lean(),
         Collection.find({ owner: ownerId }).sort({ name: 1 }).lean(),
     ]);
 
@@ -31,7 +42,9 @@ router.get('/', async (req, res) => {
         collections,
         urlsByCollection,
         uncategorized,
-        error: req.query.error || null,
+        q,
+        resultCount: urls.length,
+        error: str(req.query.error) || null,
     });
 });
 

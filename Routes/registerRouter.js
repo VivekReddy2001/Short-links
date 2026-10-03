@@ -3,9 +3,12 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 
 const User = require('../Schemas/User');
-const resumePendingAction = require('../resumePendingAction');
+const resumePendingAction = require('../lib/resumePendingAction');
+const { signIn } = require('../lib/session');
+const { str } = require('../lib/input');
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 10;
+const USERNAME_RE = /^[a-zA-Z0-9_.-]{3,32}$/;
 
 router.get('/', (req, res) => {
     if (req.session.user) return res.redirect('/dashboard');
@@ -13,24 +16,32 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const username = (req.body.username || '').trim();
-    const { password } = req.body;
+    const username = str(req.body.username);
+    const password = typeof req.body.password === 'string' ? req.body.password : '';
 
-    if (username.length < 3 || !password || password.length < 6) {
-        return res.render('register', {
-            error: 'Username must be at least 3 characters and password at least 6.',
+    // bcrypt only uses the first 72 bytes of a password; refuse longer ones
+    // rather than silently ignoring the rest.
+    if (!USERNAME_RE.test(username) || password.length < 8 || Buffer.byteLength(password) > 72) {
+        return res.status(400).render('register', {
+            error: 'Usernames are 3-32 letters, numbers, dots, dashes or underscores; passwords are 8-72 characters long.',
         });
     }
 
-    const taken = await User.findOne({ username });
-    if (taken) {
-        return res.render('register', { error: 'That username is already taken.' });
+    if (await User.exists({ username })) {
+        return res.status(409).render('register', { error: 'That username is already taken.' });
     }
 
-    const hashed = await bcrypt.hash(password, SALT_ROUNDS);
-    const user = await User.create({ username, password: hashed });
+    let user;
+    try {
+        user = await User.create({ username, password: await bcrypt.hash(password, SALT_ROUNDS) });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).render('register', { error: 'That username is already taken.' });
+        }
+        throw err;
+    }
 
-    req.session.user = { _id: user._id, username: user.username };
+    await signIn(req, user);
     await resumePendingAction(req);
     res.redirect('/dashboard');
 });

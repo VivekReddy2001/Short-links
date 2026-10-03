@@ -6,6 +6,7 @@
         <p class="error"><%= error %></p>
     <% } %>
     <form method="POST" action="/login">
+        <%- include('partials/csrf') %>
         <label>Username
             <input type="text" name="username" required autofocus />
         </label>

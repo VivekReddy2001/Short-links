@@ -188,3 +188,45 @@ button:hover {
     font-size: 0.85rem;
     padding: 2rem 0;
 }
+
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0 0 1.5rem;
+}
+.search-form input[type='search'] {
+    flex: 1 1 280px;
+}
+.note {
+    font-size: 0.85rem;
+    color: var(--text);
+    opacity: 0.85;
+}
+.collection-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.danger-button {
+    background: transparent;
+    color: var(--error);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 400;
+    margin-left: 1rem;
+}
+.link-button:hover {
+    color: var(--text);
+}
